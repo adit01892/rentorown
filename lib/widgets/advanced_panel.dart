@@ -15,7 +15,8 @@ class AdvancedPanelWidget extends ConsumerWidget {
       elevation: 2,
       margin: const EdgeInsets.all(8.0),
       child: ExpansionTile(
-        title: const Text('Advanced Settings'),
+        title: const Text('Assumptions'),
+        initiallyExpanded: true,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(

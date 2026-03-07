@@ -12,6 +12,7 @@ import 'widgets/methodology_widget.dart';
 import 'widgets/stage1_welcome_widget.dart';
 import 'widgets/cashflow_chart_widget.dart';
 import 'widgets/app_logo.dart';
+import 'widgets/app_footer.dart';
 
 void main() {
   runApp(const ProviderScope(child: HomeDecisionApp()));
@@ -122,6 +123,7 @@ class SimulatorPage extends ConsumerWidget {
               : _buildStage2(context),
         ),
       ),
+      bottomNavigationBar: const AppFooterWidget(),
     );
   }
 

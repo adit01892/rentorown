@@ -97,7 +97,7 @@ class _CoreInputsWidgetState extends ConsumerState<CoreInputsWidget> {
       elevation: currentStage == 1 ? 4 : 2,
       margin: const EdgeInsets.all(8.0),
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(currentStage == 1 ? 24.0 : 16.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -241,9 +241,9 @@ class _CoreInputsWidgetState extends ConsumerState<CoreInputsWidget> {
                 const SizedBox(height: 10),
                 Text(
                   'This simulation uses assumptions (rates, costs, inflation) you can tweak later in Advanced Settings.',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: const Color(0xFF757575)),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFF757575),
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -286,7 +286,8 @@ class _CoreInputsWidgetState extends ConsumerState<CoreInputsWidget> {
         TextFormField(
           controller: controller,
           keyboardType:
-              keyboardType ?? const TextInputType.numberWithOptions(decimal: true),
+              keyboardType ??
+              const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: inputFormatters ?? [_decimalNumberFormatter],
           style: const TextStyle(fontWeight: FontWeight.w500),
           decoration: InputDecoration(

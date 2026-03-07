@@ -115,10 +115,32 @@ class CashflowChartWidget extends ConsumerWidget {
                           rod.toY,
                           symbol: country.currencySymbol,
                         );
+
+                        if (rodIndex == 0) {
+                          return BarTooltipItem(
+                            'Year $groupIndex\n',
+                            const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: '$label: $value',
+                                style: TextStyle(
+                                  color: rod.color ?? Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+
                         return BarTooltipItem(
-                          'Year $groupIndex\n$label: $value',
-                          const TextStyle(
-                            color: Colors.white,
+                          '$label: $value',
+                          TextStyle(
+                            color: rod.color ?? Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),

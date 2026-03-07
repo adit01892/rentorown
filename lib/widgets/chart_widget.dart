@@ -68,7 +68,7 @@ class ChartWidget extends ConsumerWidget {
               child: LineChart(
                 LineChartData(
                   minX: 0,
-                  maxX: maxX,
+                  maxX: maxX * 1.05,
                   minY: minY < 0 ? minY * 1.1 : minY,
                   maxY: maxY > 0 ? maxY * 1.1 : 10.0,
                   lineBarsData: [
@@ -170,11 +170,38 @@ class ChartWidget extends ConsumerWidget {
                       getTooltipItems: (List<LineBarSpot> touchedSpots) {
                         return touchedSpots.map((spot) {
                           final color = spot.bar.color ?? Colors.white;
+                          final label = spot.barIndex == 0 ? 'Buy' : 'Rent';
+                          final value = formatCurrency(
+                            spot.y,
+                            symbol: country.currencySymbol,
+                          );
+
+                          if (spot == touchedSpots.first) {
+                            return LineTooltipItem(
+                              'Year ${spot.x.toInt()}\n',
+                              const TextStyle(
+                                color: Colors.black87,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: '$label: $value',
+                                  style: TextStyle(
+                                    color: color,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
                           return LineTooltipItem(
-                            'Year ${spot.x.toInt()}: ${formatCurrency(spot.y, symbol: country.currencySymbol)}',
+                            '$label: $value',
                             TextStyle(
                               color: color,
                               fontWeight: FontWeight.bold,
+                              fontSize: 13,
                             ),
                           );
                         }).toList();

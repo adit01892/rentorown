@@ -45,66 +45,81 @@ class HeadlineResultWidget extends ConsumerWidget {
               ? (constraints.maxWidth - 48) / 4
               : (constraints.maxWidth - 16) / 2;
 
-          return Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            alignment: WrapAlignment.center,
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildMetricCard(
-                context,
-                'Buy Scenario',
-                buyStr,
-                'Est. net worth after $duration years if you buy',
-                cardWidth,
-                Theme.of(context).colorScheme.primary,
-                trailingIcon: buyFinal > rentFinal
-                    ? const Icon(
-                        Icons.arrow_upward,
-                        color: Colors.green,
-                        size: 16,
-                      )
-                    : const Icon(
-                        Icons.arrow_downward,
-                        color: Colors.red,
-                        size: 16,
-                      ),
-              ),
-              _buildMetricCard(
-                context,
-                'Rent Scenario',
-                rentStr,
-                'Est. net worth after $duration years if you rent',
-                cardWidth,
-                Theme.of(context).colorScheme.secondary,
-                trailingIcon: rentFinal > buyFinal
-                    ? const Icon(
-                        Icons.arrow_upward,
-                        color: Colors.green,
-                        size: 16,
-                      )
-                    : const Icon(
-                        Icons.arrow_downward,
-                        color: Colors.red,
-                        size: 16,
-                      ),
-              ),
-              _buildMetricCard(
-                context,
-                'Difference',
-                absDiffStr,
+              Text(
                 isBuyingBetter
-                    ? 'Buying outperforms renting after $duration years'
-                    : 'Renting outperforms buying after $duration years',
-                cardWidth,
-                isBuyingBetter ? Colors.green[700] : Colors.red[700],
+                    ? 'You are better off buying rather than renting by $absDiffStr (based on the simulation)'
+                    : 'You are better off renting rather than buying by $absDiffStr (based on the simulation)',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isBuyingBetter ? Colors.green[700] : Colors.red[700],
+                ),
               ),
-              _buildMetricCard(
-                context,
-                'Breakeven',
-                breakevenStr,
-                'When buying overtakes renting',
-                cardWidth,
-                null,
+              const SizedBox(height: 24),
+              Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildMetricCard(
+                    context,
+                    'Buy Scenario',
+                    buyStr,
+                    'Est. net worth after $duration years if you buy',
+                    cardWidth,
+                    Theme.of(context).colorScheme.primary,
+                    trailingIcon: buyFinal > rentFinal
+                        ? const Icon(
+                            Icons.arrow_upward,
+                            color: Colors.green,
+                            size: 16,
+                          )
+                        : const Icon(
+                            Icons.arrow_downward,
+                            color: Colors.red,
+                            size: 16,
+                          ),
+                  ),
+                  _buildMetricCard(
+                    context,
+                    'Rent Scenario',
+                    rentStr,
+                    'Est. net worth after $duration years if you rent',
+                    cardWidth,
+                    Theme.of(context).colorScheme.secondary,
+                    trailingIcon: rentFinal > buyFinal
+                        ? const Icon(
+                            Icons.arrow_upward,
+                            color: Colors.green,
+                            size: 16,
+                          )
+                        : const Icon(
+                            Icons.arrow_downward,
+                            color: Colors.red,
+                            size: 16,
+                          ),
+                  ),
+                  _buildMetricCard(
+                    context,
+                    'Difference',
+                    absDiffStr,
+                    isBuyingBetter
+                        ? 'Buying outperforms renting after $duration years'
+                        : 'Renting outperforms buying after $duration years',
+                    cardWidth,
+                    isBuyingBetter ? Colors.green[700] : Colors.red[700],
+                  ),
+                  _buildMetricCard(
+                    context,
+                    'Breakeven',
+                    breakevenStr,
+                    'When buying overtakes renting',
+                    cardWidth,
+                    null,
+                  ),
+                ],
               ),
             ],
           );
