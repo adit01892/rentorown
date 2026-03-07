@@ -63,6 +63,50 @@ class HomePage extends StatelessWidget {
                       );
                     },
                   ),
+                  const SizedBox(height: 48),
+                  Text(
+                    'Not sure where to start?',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF212121),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Pick the question that matches your situation:',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 15),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildQuestionCard(
+                    context,
+                    question: 'Should I rent or buy a home?',
+                    route: '/rent-vs-buy',
+                    icon: Icons.house_rounded,
+                  ),
+                  _buildQuestionCard(
+                    context,
+                    question: 'Should I pay off debt or invest?',
+                    route: '/wealth-frontier',
+                    icon: Icons.trending_up_rounded,
+                  ),
+                  _buildQuestionCard(
+                    context,
+                    question: 'Have I saved enough to stop saving?',
+                    route: '/coast-fi',
+                    icon: Icons.sailing_rounded,
+                  ),
+                  _buildQuestionCard(
+                    context,
+                    question: 'Is my ESPP or RSU worth it?',
+                    route: '/espp-rsu',
+                    icon: Icons.work_history_rounded,
+                  ),
+                  _buildQuestionCard(
+                    context,
+                    question: 'How much rent can I actually afford?',
+                    route: '/rent-affordability',
+                    icon: Icons.account_balance_wallet_rounded,
+                  ),
                 ],
               ),
             ),
@@ -147,6 +191,46 @@ class HomePage extends StatelessWidget {
                   child: const Text('Try now'),
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuestionCard(
+    BuildContext context, {
+    required String question,
+    required String route,
+    required IconData icon,
+  }) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => context.go(route),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 22,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  question,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    color: Color(0xFF212121),
+                  ),
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
             ],
           ),
         ),

@@ -8,8 +8,8 @@ class CoastFiState {
   final int retirementAge;
   final double currentSavings;
   final double annualSpendingRetirement;
-  final double safeWithdrawalRate; // 0.04 = 4%
-  final double expectedAnnualReturn; // 0.07 = 7%
+  final double safeWithdrawalRate; // e.g. 4.0 for 4%
+  final double expectedAnnualReturn; // e.g. 7.0 for 7%
   final double currentAnnualSavings;
 
   const CoastFiState({
@@ -17,8 +17,8 @@ class CoastFiState {
     this.retirementAge = 65,
     this.currentSavings = 100000,
     this.annualSpendingRetirement = 60000,
-    this.safeWithdrawalRate = 0.04,
-    this.expectedAnnualReturn = 0.07,
+    this.safeWithdrawalRate = 4.0,
+    this.expectedAnnualReturn = 7.0,
     this.currentAnnualSavings = 12000,
   });
 
@@ -48,7 +48,7 @@ class CoastFiState {
   /// Total amount needed at retirement age to safely withdraw desired annual spending
   double get requiredRetirementCorpus {
     if (safeWithdrawalRate <= 0) return 0;
-    return annualSpendingRetirement / safeWithdrawalRate;
+    return annualSpendingRetirement / (safeWithdrawalRate / 100);
   }
 
   /// The amount you would need TODAY so that it grows to the requiredRetirementCorpus by retirement age without adding another dime.
@@ -58,7 +58,7 @@ class CoastFiState {
 
     // PV = FV / (1 + r)^n
     return requiredRetirementCorpus /
-        pow(1 + expectedAnnualReturn, yearsToRetirement);
+        pow(1 + (expectedAnnualReturn / 100), yearsToRetirement);
   }
 
   bool get isCoasting => currentSavings >= coastNumberToday;
@@ -67,7 +67,8 @@ class CoastFiState {
   double get coastingFutureValue {
     final yearsToRetirement = retirementAge - currentAge;
     if (yearsToRetirement <= 0) return currentSavings;
-    return currentSavings * pow(1 + expectedAnnualReturn, yearsToRetirement);
+    return currentSavings *
+        pow(1 + (expectedAnnualReturn / 100), yearsToRetirement);
   }
 }
 
@@ -83,17 +84,26 @@ class CoastFiNotifier extends Notifier<CoastFiState> {
     return coastFiDefaults[initialCountry.code] ?? coastFiDefaults['us']!;
   }
 
-  void updateCurrentAge(int value) => state = state.copyWith(currentAge: value);
-  void updateRetirementAge(int value) =>
+  void updateCurrentAge(int value) {
+    if (value < state.retirementAge) {
+      state = state.copyWith(currentAge: value);
+    }
+  }
+
+  void updateRetirementAge(int value) {
+    if (value > state.currentAge) {
       state = state.copyWith(retirementAge: value);
+    }
+  }
+
   void updateCurrentSavings(double value) =>
       state = state.copyWith(currentSavings: value);
   void updateAnnualSpendingRetirement(double value) =>
       state = state.copyWith(annualSpendingRetirement: value);
   void updateSafeWithdrawalRate(double value) =>
-      state = state.copyWith(safeWithdrawalRate: value / 100);
+      state = state.copyWith(safeWithdrawalRate: value);
   void updateExpectedReturn(double value) =>
-      state = state.copyWith(expectedAnnualReturn: value / 100);
+      state = state.copyWith(expectedAnnualReturn: value);
   void updateCurrentAnnualSavings(double value) =>
       state = state.copyWith(currentAnnualSavings: value);
 }

@@ -144,28 +144,33 @@ class SimulatorPage extends ConsumerWidget {
         if (constraints.maxWidth > 800) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  width: 400,
-                  child: Column(
-                    children: [CoreInputsWidget(), AdvancedPanelWidget()],
-                  ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      width: 400,
+                      child: Column(
+                        children: [CoreInputsWidget(), AdvancedPanelWidget()],
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    const Expanded(
+                      child: Column(
+                        children: [
+                          HeadlineResultWidget(),
+                          ChartWidget(),
+                          CashflowChartWidget(),
+                          MethodologyWidget(),
+                          DisclaimerWidget(),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 24),
-                const Expanded(
-                  child: Column(
-                    children: [
-                      HeadlineResultWidget(),
-                      ChartWidget(),
-                      CashflowChartWidget(),
-                      MethodologyWidget(),
-                      DisclaimerWidget(),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           );
         }

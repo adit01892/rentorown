@@ -58,11 +58,10 @@ class EsppState {
   double get valueAtEnd => sharesBought * endPrice;
   double get profit => valueAtEnd - cashInvested;
 
-  // Annualized return = (Profit / Average Cash Invested) * (12 / Duration)
-  // Usually cash is invested evenly over the 6 months, so average cash invested is ~ half the total cash.
-  // Standard simple formula: (Profit / Cash Invested) * (12 / Duration)
+  // Annualized return using average invested capital
+  // Cash is invested evenly over the offering period, so average capital deployed is ~half the total.
   double get effectiveYield => cashInvested > 0
-      ? (profit / cashInvested) * (12 / offeringPeriodMonths)
+      ? (profit / (cashInvested / 2)) * (12 / offeringPeriodMonths)
       : 0.0;
 }
 

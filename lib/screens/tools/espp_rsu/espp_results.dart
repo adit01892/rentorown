@@ -57,6 +57,48 @@ class EsppResults extends ConsumerWidget {
             ),
           ),
         ),
+        const SizedBox(height: 12),
+        Builder(
+          builder: (context) {
+            return Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.05),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.2),
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.lightbulb_outline,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      state.effectiveYield > 0
+                          ? 'This annualized return accounts for the ESPP discount and stock price change. Compare it to your alternative investment return (e.g. index fund ~8%) to decide whether to max out contributions.'
+                          : 'The stock price drop exceeded the ESPP discount, resulting in a negative return. Consider whether you expect the stock to recover before deciding on contributions.',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF616161),
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
         const SizedBox(height: 24),
         Card(
           child: Padding(

@@ -77,7 +77,7 @@ class CoastFiInputs extends ConsumerWidget {
               label: 'Safe Withdrawal Rate (%)',
               tooltip:
                   'The percentage of your portfolio you can safely withdraw each year in retirement (e.g. 4% rule).',
-              initialValue: state.safeWithdrawalRate * 100,
+              initialValue: state.safeWithdrawalRate,
               isCurrency: false,
               currencySymbol: currencySymbol,
               suffixText: '%',
@@ -89,7 +89,7 @@ class CoastFiInputs extends ConsumerWidget {
               label: 'Expected Real Annual Return (%)',
               tooltip:
                   'Your expected average annual return after accounting for inflation.',
-              initialValue: state.expectedAnnualReturn * 100,
+              initialValue: state.expectedAnnualReturn,
               isCurrency: false,
               currencySymbol: currencySymbol,
               suffixText: '%',

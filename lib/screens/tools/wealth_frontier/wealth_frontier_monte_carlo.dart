@@ -97,9 +97,13 @@ MonteCarloResult _calculateMonteCarlo(MonteCarloParams params) {
             invAllocation = cash;
           }
         case WealthStrategy.investFirst:
-          // Min debt payment assuming 0? Or just pure strategy? We assume no min payment enforcement here, just purely allocating extra cash.
-          // Wait, normally debt has min payment. Let's assume the extra cash is completely flexible.
-          invAllocation = cash;
+          // Enforce minimum interest-only payment to prevent unrealistic debt spiral
+          double interestOwed = state.currentDebt > 0
+              ? currentDebt * monthlyDebtRate
+              : 0;
+          double minPayment = min(cash, interestOwed);
+          debtAllocation = minPayment;
+          invAllocation = cash - minPayment;
         case WealthStrategy.split5050:
           if (currentDebt > 0) {
             debtAllocation = min(cash * 0.5, currentDebt);

@@ -148,7 +148,75 @@ class CoastFiResults extends ConsumerWidget {
             ),
           ),
         ),
+        const SizedBox(height: 16),
+        // Contextual insight
+        if (isCoasting && state.currentAge < 40)
+          _buildInsightCard(
+            context,
+            icon: Icons.celebration,
+            color: Colors.green,
+            text:
+                'You\'ve reached Coast FI at age ${state.currentAge}! This means you could switch to a lower-paying passion job and still retire comfortably at ${state.retirementAge}.',
+          )
+        else if (isCoasting)
+          _buildInsightCard(
+            context,
+            icon: Icons.check_circle_outline,
+            color: Colors.green,
+            text:
+                'You\'ve hit your Coast Number! If you never save another penny, your current savings should grow to cover retirement at your target spending level.',
+          )
+        else if ((coastNumberToday - state.currentSavings) / coastNumberToday <
+            0.20)
+          _buildInsightCard(
+            context,
+            icon: Icons.trending_up,
+            color: Colors.orange,
+            text:
+                'Almost there! You\'re within ${(((coastNumberToday - state.currentSavings) / coastNumberToday) * 100).toStringAsFixed(0)}% of your Coast Number. A small boost in savings could get you across the finish line.',
+          )
+        else
+          _buildInsightCard(
+            context,
+            icon: Icons.info_outline,
+            color: Theme.of(context).colorScheme.primary,
+            text:
+                'You need ${fullCurrencyFormat.format(coastNumberToday - state.currentSavings)} more to reach your Coast Number. Once you hit it, your savings can grow to your target on autopilot.',
+          ),
       ],
+    );
+  }
+
+  Widget _buildInsightCard(
+    BuildContext context, {
+    required IconData icon,
+    required Color color,
+    required String text,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13,
+                color: color.withValues(alpha: 0.9),
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

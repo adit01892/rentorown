@@ -77,7 +77,7 @@ class Stage1WelcomeWidget extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          'Aspire strips away the emotion and lays bare the financial reality of renting versus buying over your specified time horizon.',
+          'The Rent vs. Buy calculator strips away the emotion and lays bare the financial reality of renting versus buying over your specified time horizon.',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             color: const Color(0xFF616161),
             height: 1.5,

@@ -37,12 +37,12 @@ class CoastFiChart extends ConsumerWidget {
 
     for (int i = 0; i <= yearsToRetirement; i++) {
       double fvCurrentSavings =
-          state.currentSavings * pow(1 + state.expectedAnnualReturn, i);
+          state.currentSavings * pow(1 + (state.expectedAnnualReturn / 100), i);
 
       // The required amount at year 'i' to hit the corpus by retirement
       double requiredAtI =
           state.requiredRetirementCorpus /
-          pow(1 + state.expectedAnnualReturn, yearsToRetirement - i);
+          pow(1 + (state.expectedAnnualReturn / 100), yearsToRetirement - i);
 
       currentSavingsGrowth.add(FlSpot(i.toDouble(), fvCurrentSavings));
       requiredTrajectory.add(FlSpot(i.toDouble(), requiredAtI));

@@ -6,8 +6,8 @@ final coastFiDefaults = {
     retirementAge: 65,
     currentSavings: 80000,
     annualSpendingRetirement: 40000,
-    safeWithdrawalRate: 0.04,
-    expectedAnnualReturn: 0.06,
+    safeWithdrawalRate: 4.0,
+    expectedAnnualReturn: 6.0,
     currentAnnualSavings: 10000,
   ),
   'us': const CoastFiState(
@@ -15,8 +15,8 @@ final coastFiDefaults = {
     retirementAge: 65,
     currentSavings: 100000,
     annualSpendingRetirement: 60000,
-    safeWithdrawalRate: 0.04,
-    expectedAnnualReturn: 0.07,
+    safeWithdrawalRate: 4.0,
+    expectedAnnualReturn: 7.0,
     currentAnnualSavings: 12000,
   ),
   'eu': const CoastFiState(
@@ -24,8 +24,8 @@ final coastFiDefaults = {
     retirementAge: 65,
     currentSavings: 70000,
     annualSpendingRetirement: 35000,
-    safeWithdrawalRate: 0.04,
-    expectedAnnualReturn: 0.05,
+    safeWithdrawalRate: 4.0,
+    expectedAnnualReturn: 5.0,
     currentAnnualSavings: 8000,
   ),
 };

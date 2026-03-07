@@ -109,6 +109,34 @@ class RentAffordabilityResults extends ConsumerWidget {
             ),
           ),
         ),
+        const SizedBox(height: 16),
+        // Contextual insight
+        if (!isStressed && recommendedRent > state.rule30PercentGross)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.green.withValues(alpha: 0.08),
+              border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.check_circle_outline, color: Colors.green, size: 20),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Your budget-based rent exceeds the 30% rule, but that\'s not necessarily bad — it means your other expenses and savings are lean. You can afford more.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF2E7D32),
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -68,7 +69,13 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
         final p50Spots = buildSpots(result.p50Path);
         final p90Spots = buildSpots(result.p90Path);
 
-        double maxY = p90Spots.last.y * 1.1;
+        double maxY = p90Spots.map((s) => s.y).reduce(max) * 1.1;
+        double minY = p10Spots.map((s) => s.y).reduce(min);
+        if (minY > 0) {
+          minY = 0;
+        } else {
+          minY = minY * 1.1;
+        }
 
         return Column(
           children: [
@@ -84,6 +91,15 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _strategyExplanation(state.strategy),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF757575),
+                        height: 1.4,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     _buildStrategyDropdown(
                       context,
@@ -94,6 +110,28 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                 ),
               ),
             ),
+            // Contextual insight card
+            if (state.currentDebt == 0)
+              _buildInsightCard(
+                icon: Icons.lightbulb_outline,
+                color: Colors.blue,
+                text:
+                    'You have no debt — all strategies converge to the same outcome. Focus on maximizing your investment contributions.',
+              )
+            else if (state.debtInterestRate > state.expectedReturn)
+              _buildInsightCard(
+                icon: Icons.warning_amber_rounded,
+                color: Colors.orange,
+                text:
+                    'Your debt interest rate (${state.debtInterestRate.toStringAsFixed(1)}%) is higher than your expected return (${state.expectedReturn.toStringAsFixed(1)}%). Mathematically, paying off debt first is almost always the better move.',
+              )
+            else
+              _buildInsightCard(
+                icon: Icons.trending_up,
+                color: Colors.green,
+                text:
+                    'Your expected return (${state.expectedReturn.toStringAsFixed(1)}%) exceeds your debt rate (${state.debtInterestRate.toStringAsFixed(1)}%). Investing may yield more over time, but carries market risk.',
+              ),
             const SizedBox(height: 24),
             Row(
               children: [
@@ -156,7 +194,7 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Median Outcome',
+                            'Average Outcome',
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: const Color(0xFF757575)),
                           ),
@@ -332,7 +370,7 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                           text: '90th Percentile (Optimistic)',
                         ),
                         _LegendItem(
-                          color: Colors.deepPurple,
+                          color: Color(0xFF0052FF),
                           text: 'Median Expected',
                         ),
                         _LegendItem(
@@ -387,6 +425,50 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
       ),
     );
   }
+
+  String _strategyExplanation(WealthStrategy strategy) {
+    switch (strategy) {
+      case WealthStrategy.payDebtFirst:
+        return 'All extra cash aggressively eliminates debt first. Once debt hits \$0, everything goes to investments. Conservative but offers a guaranteed return equal to your debt rate.';
+      case WealthStrategy.investFirst:
+        return 'Minimum interest-only debt payments are made, and all remaining cash goes into investments. Higher potential returns but your debt persists longer.';
+      case WealthStrategy.split5050:
+        return 'Extra cash is split evenly — half pays down debt, half goes to investments. A balanced approach between guaranteed debt reduction and market growth.';
+    }
+  }
+
+  Widget _buildInsightCard({
+    required IconData icon,
+    required Color color,
+    required String text,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13,
+                color: color.withValues(alpha: 0.9),
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _LegendItem extends StatelessWidget {
@@ -401,16 +483,16 @@ class _LegendItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 12,
-          height: 12,
+          width: 10,
+          height: 10,
           decoration: BoxDecoration(shape: BoxShape.circle, color: color),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 13,
+            fontSize: 12,
             color: Color(0xFF616161),
           ),
         ),
