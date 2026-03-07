@@ -6,6 +6,6 @@ void main() {
   testWidgets('App compiles and shows title', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: HomeDecisionApp()));
 
-    expect(find.text('Rent or Own'), findsWidgets);
+    expect(find.text('Aspire'), findsWidgets);
   });
 }

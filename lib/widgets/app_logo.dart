@@ -10,58 +10,66 @@ class AppLogo extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0052FF), Color(0xFF2A7BFF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(size * 0.28),
-      ),
       alignment: Alignment.center,
-      child: CustomPaint(size: Size.square(size), painter: _LogoPainter()),
+      child: CustomPaint(
+        size: Size.square(size),
+        painter: _LogoPainter(Theme.of(context).colorScheme.primary),
+      ),
     );
   }
 }
 
 class _LogoPainter extends CustomPainter {
+  final Color primaryColor;
+
+  _LogoPainter(this.primaryColor);
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final gradient = LinearGradient(
+      colors: [primaryColor, const Color(0xFF10B981)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    final paintBase = Paint()
+      ..shader = gradient.createShader(rect)
       ..style = PaintingStyle.stroke
-      ..color = Colors.white
-      ..strokeWidth = size.width * 0.08
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    // House: roof + body + door. Kept intentionally geometric and minimal.
-    final house = Path()
-      ..moveTo(size.width * 0.22, size.height * 0.52)
-      ..lineTo(size.width * 0.50, size.height * 0.28)
-      ..lineTo(size.width * 0.78, size.height * 0.52)
-      ..moveTo(size.width * 0.30, size.height * 0.50)
-      ..lineTo(size.width * 0.30, size.height * 0.76)
-      ..lineTo(size.width * 0.70, size.height * 0.76)
-      ..lineTo(size.width * 0.70, size.height * 0.50)
-      ..moveTo(size.width * 0.50, size.height * 0.76)
-      ..lineTo(size.width * 0.50, size.height * 0.60);
+    // The abstracted "A" peak
+    final pathPaint = Paint()
+      ..shader = paintBase.shader
+      ..style = paintBase.style
+      ..strokeCap = paintBase.strokeCap
+      ..strokeJoin = paintBase.strokeJoin
+      ..strokeWidth = size.width * 0.125;
 
-    canvas.drawPath(house, paint);
+    final peakPath = Path()
+      ..moveTo(0, size.height)
+      ..lineTo(size.width * 0.5, size.height * 0.125)
+      ..lineTo(size.width, size.height);
 
-    // Key: ring + shaft + tooth, offset to suggest "rent".
-    final keyRingCenter = Offset(size.width * 0.27, size.height * 0.32);
-    canvas.drawCircle(keyRingCenter, size.width * 0.10, paint);
+    canvas.drawPath(peakPath, pathPaint);
 
-    final key = Path()
-      ..moveTo(size.width * 0.34, size.height * 0.32)
-      ..lineTo(size.width * 0.58, size.height * 0.32)
-      ..moveTo(size.width * 0.52, size.height * 0.32)
-      ..lineTo(size.width * 0.52, size.height * 0.42)
-      ..lineTo(size.width * 0.58, size.height * 0.42);
+    // The crossbar
+    final linePaint = Paint()
+      ..shader = paintBase.shader
+      ..style = paintBase.style
+      ..strokeCap = paintBase.strokeCap
+      ..strokeJoin = paintBase.strokeJoin
+      ..strokeWidth = size.width * 0.10;
 
-    canvas.drawPath(key, paint);
+    canvas.drawLine(
+      Offset(size.width * 0.3, size.height * 0.625),
+      Offset(size.width * 0.7, size.height * 0.625),
+      linePaint,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

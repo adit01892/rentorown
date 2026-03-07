@@ -61,7 +61,7 @@ class Stage1WelcomeWidget extends StatelessWidget {
             AppLogo(size: 42),
             SizedBox(width: 12),
             Text(
-              'Rent or Own',
+              'Rent vs. Buy',
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 24),
             ),
           ],
@@ -77,7 +77,7 @@ class Stage1WelcomeWidget extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          'Rent or Own strips away the emotion and lays bare the financial reality of renting versus buying over your specified time horizon.',
+          'Aspire strips away the emotion and lays bare the financial reality of renting versus buying over your specified time horizon.',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             color: const Color(0xFF616161),
             height: 1.5,

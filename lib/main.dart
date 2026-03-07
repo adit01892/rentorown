@@ -6,25 +6,58 @@ import 'widgets/core_inputs.dart';
 import 'widgets/advanced_panel.dart';
 import 'widgets/headline_result.dart';
 import 'widgets/chart_widget.dart';
-import 'widgets/country_selector.dart';
+
 import 'widgets/disclaimer.dart';
 import 'widgets/methodology_widget.dart';
 import 'widgets/stage1_welcome_widget.dart';
 import 'widgets/cashflow_chart_widget.dart';
-import 'widgets/app_logo.dart';
-import 'widgets/app_footer.dart';
+import 'package:go_router/go_router.dart';
+import 'screens/home/home_page.dart';
+import 'screens/tools/wealth_frontier/wealth_frontier_page.dart';
+import 'screens/tools/coast_fi/coast_fi_page.dart';
+import 'screens/tools/espp_rsu/espp_rsu_page.dart';
+import 'screens/tools/rent_affordability/rent_affordability_page.dart';
+import 'widgets/tool_scaffold.dart';
 
 void main() {
   runApp(const ProviderScope(child: HomeDecisionApp()));
 }
+
+final _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(path: '/', builder: (context, state) => const HomePage()),
+    GoRoute(
+      path: '/rent-vs-buy',
+      builder: (context, state) => const SimulatorPage(),
+    ),
+    GoRoute(
+      path: '/wealth-frontier',
+      builder: (context, state) => const WealthFrontierPage(),
+    ),
+    GoRoute(
+      path: '/coast-fi',
+      builder: (context, state) => const CoastFiPage(),
+    ),
+    GoRoute(
+      path: '/espp-rsu',
+      builder: (context, state) => const EsppRsuPage(),
+    ),
+    GoRoute(
+      path: '/rent-affordability',
+      builder: (context, state) => const RentAffordabilityPage(),
+    ),
+  ],
+);
 
 class HomeDecisionApp extends StatelessWidget {
   const HomeDecisionApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Rent or Own',
+    return MaterialApp.router(
+      routerConfig: _router,
+      title: 'Aspire',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -76,7 +109,6 @@ class HomeDecisionApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const SimulatorPage(),
     );
   }
 }
@@ -88,42 +120,15 @@ class SimulatorPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStage = ref.watch(stageProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AppLogo(size: 30),
-            SizedBox(width: 10),
-            Text('Rent or Own', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: const Color(0xFFE0E0E0), height: 1.0),
-        ),
-        actions: const [CountrySelectorWidget(), SizedBox(width: 16)],
-        leading: currentStage == 2
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  ref.read(stageProvider.notifier).setStage(1);
-                },
-              )
-            : null,
+    return ToolScaffold(
+      titleOverride: 'Rent vs Buy',
+      showCountrySelector: true,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: currentStage == 1
+            ? _buildStage1(context)
+            : _buildStage2(context),
       ),
-      body: SafeArea(
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          child: currentStage == 1
-              ? _buildStage1(context)
-              : _buildStage2(context),
-        ),
-      ),
-      bottomNavigationBar: const AppFooterWidget(),
     );
   }
 
@@ -137,22 +142,21 @@ class SimulatorPage extends ConsumerWidget {
       builder: (context, constraints) {
         // Responsive layout: Desktop vs Mobile
         if (constraints.maxWidth > 800) {
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: 360,
-                child: SingleChildScrollView(
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  width: 400,
                   child: Column(
-                    children: const [CoreInputsWidget(), AdvancedPanelWidget()],
+                    children: [CoreInputsWidget(), AdvancedPanelWidget()],
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 2,
-                child: SingleChildScrollView(
+                const SizedBox(width: 24),
+                const Expanded(
                   child: Column(
-                    children: const [
+                    children: [
                       HeadlineResultWidget(),
                       ChartWidget(),
                       CashflowChartWidget(),
@@ -161,20 +165,28 @@ class SimulatorPage extends ConsumerWidget {
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         }
         // Mobile layout
         return const SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               HeadlineResultWidget(),
+              SizedBox(height: 16),
               ChartWidget(),
+              SizedBox(height: 16),
               CashflowChartWidget(),
+              SizedBox(height: 16),
               MethodologyWidget(),
+              SizedBox(height: 16),
               CoreInputsWidget(),
+              SizedBox(height: 16),
               AdvancedPanelWidget(),
+              SizedBox(height: 16),
               DisclaimerWidget(),
             ],
           ),
