@@ -146,18 +146,19 @@ class SimulatorPage extends ConsumerWidget {
             padding: const EdgeInsets.all(24.0),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1000),
+                constraints: const BoxConstraints(maxWidth: 1200),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(
-                      width: 400,
+                    const Expanded(
+                      flex: 4,
                       child: Column(
                         children: [CoreInputsWidget(), AdvancedPanelWidget()],
                       ),
                     ),
                     const SizedBox(width: 24),
                     const Expanded(
+                      flex: 7,
                       child: Column(
                         children: [
                           HeadlineResultWidget(),
@@ -180,6 +181,10 @@ class SimulatorPage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              CoreInputsWidget(),
+              SizedBox(height: 16),
+              AdvancedPanelWidget(),
+              SizedBox(height: 16),
               HeadlineResultWidget(),
               SizedBox(height: 16),
               ChartWidget(),
@@ -187,10 +192,6 @@ class SimulatorPage extends ConsumerWidget {
               CashflowChartWidget(),
               SizedBox(height: 16),
               MethodologyWidget(),
-              SizedBox(height: 16),
-              CoreInputsWidget(),
-              SizedBox(height: 16),
-              AdvancedPanelWidget(),
               SizedBox(height: 16),
               DisclaimerWidget(),
             ],

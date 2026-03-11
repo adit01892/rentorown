@@ -69,27 +69,18 @@ class CashflowChartWidget extends ConsumerWidget {
     }
 
     return Card(
-      margin: const EdgeInsets.all(8.0),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Cashflow Comparison',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                Row(
-                  children: [
-                    _buildLegendItem('Buying', primaryColor),
-                    const SizedBox(width: 16),
-                    _buildLegendItem('Renting', secondaryColor),
-                  ],
-                ),
-              ],
+            Text(
+              'Cashflow Comparison',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
+
             const SizedBox(height: 8),
             Text(
               'Annual cashflows — final year includes net worth returned as cash',
@@ -108,7 +99,7 @@ class CashflowChartWidget extends ConsumerWidget {
                   barTouchData: BarTouchData(
                     enabled: true,
                     touchTooltipData: BarTouchTooltipData(
-                      getTooltipColor: (_) => const Color(0xFF1A1A2E),
+                      getTooltipColor: (_) => const Color(0xFF1E1E2C),
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         final label = rodIndex == 0 ? 'Buy' : 'Rent';
                         final value = formatCurrency(
@@ -121,7 +112,7 @@ class CashflowChartWidget extends ConsumerWidget {
                             'Year $groupIndex\n',
                             const TextStyle(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
                             children: [
@@ -129,8 +120,8 @@ class CashflowChartWidget extends ConsumerWidget {
                                 text: '$label: $value',
                                 style: TextStyle(
                                   color: rod.color ?? Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
@@ -141,8 +132,8 @@ class CashflowChartWidget extends ConsumerWidget {
                           '$label: $value',
                           TextStyle(
                             color: rod.color ?? Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
                           ),
                         );
                       },
@@ -204,13 +195,7 @@ class CashflowChartWidget extends ConsumerWidget {
                     getDrawingHorizontalLine: (_) =>
                         FlLine(color: const Color(0xFFE0E0E0), strokeWidth: 1),
                   ),
-                  borderData: FlBorderData(
-                    show: true,
-                    border: const Border(
-                      bottom: BorderSide(color: Color(0xFFE0E0E0)),
-                      left: BorderSide(color: Color(0xFFE0E0E0)),
-                    ),
-                  ),
+                  borderData: FlBorderData(show: false),
                   // Zero line
                   extraLinesData: ExtraLinesData(
                     horizontalLines: [
@@ -225,6 +210,15 @@ class CashflowChartWidget extends ConsumerWidget {
                   barGroups: barGroups,
                 ),
               ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLegendItem('Buying', primaryColor),
+                const SizedBox(width: 24),
+                _buildLegendItem('Renting', secondaryColor),
+              ],
             ),
           ],
         ),

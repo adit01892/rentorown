@@ -35,36 +35,20 @@ class ChartWidget extends ConsumerWidget {
 
     return Card(
       elevation: 2,
-      margin: const EdgeInsets.all(8.0),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Net Worth Over Time',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                Row(
-                  children: [
-                    _buildLegendItem(
-                      'Buying',
-                      Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(width: 16),
-                    _buildLegendItem(
-                      'Renting',
-                      Theme.of(context).colorScheme.secondary,
-                    ),
-                  ],
-                ),
-              ],
+            Text(
+              'Net Worth Over Time',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             SizedBox(
-              height: 300,
+              height: 320,
               child: LineChart(
                 LineChartData(
                   minX: 0,
@@ -76,18 +60,26 @@ class ChartWidget extends ConsumerWidget {
                       spots: result.buyNetWorth
                           .map((p) => FlSpot(p.year.toDouble(), p.amount))
                           .toList(),
-                      isCurved: false,
+                      isCurved: true,
                       color: Theme.of(context).colorScheme.primary,
-                      barWidth: 3,
+                      barWidth: 4,
+                      isStrokeCapRound: true,
                       dotData: const FlDotData(show: false),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
+                      ),
                     ),
                     LineChartBarData(
                       spots: result.rentNetWorth
                           .map((p) => FlSpot(p.year.toDouble(), p.amount))
                           .toList(),
-                      isCurved: false,
+                      isCurved: true,
                       color: Theme.of(context).colorScheme.secondary,
                       barWidth: 3,
+                      isStrokeCapRound: true,
                       dotData: const FlDotData(show: false),
                     ),
                   ],
@@ -106,7 +98,10 @@ class ChartWidget extends ConsumerWidget {
                             meta: meta,
                             child: Text(
                               value.toInt().toString(),
-                              style: const TextStyle(fontSize: 12),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF757575),
+                              ),
                             ),
                           );
                         },
@@ -125,7 +120,10 @@ class ChartWidget extends ConsumerWidget {
                                 value,
                                 symbol: country.currencySymbol,
                               ),
-                              style: const TextStyle(fontSize: 12),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF757575),
+                              ),
                               textAlign: TextAlign.right,
                               maxLines: 1,
                               overflow: TextOverflow.visible,
@@ -144,29 +142,18 @@ class ChartWidget extends ConsumerWidget {
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
+                    drawHorizontalLine: true,
                     getDrawingHorizontalLine: (value) {
-                      return FlLine(
-                        color: Colors.grey.withAlpha(50),
+                      return const FlLine(
+                        color: Color(0xFFEEEEEE),
                         strokeWidth: 1,
-                        dashArray: [5, 5],
                       );
                     },
                   ),
-                  borderData: FlBorderData(
-                    show: true,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.withAlpha(200),
-                        width: 1,
-                      ),
-                      left: BorderSide.none,
-                      right: BorderSide.none,
-                      top: BorderSide.none,
-                    ),
-                  ),
+                  borderData: FlBorderData(show: false),
                   lineTouchData: LineTouchData(
                     touchTooltipData: LineTouchTooltipData(
-                      getTooltipColor: (touchedSpot) => Colors.white,
+                      getTooltipColor: (_) => const Color(0xFF1E1E2C),
                       getTooltipItems: (List<LineBarSpot> touchedSpots) {
                         return touchedSpots.map((spot) {
                           final color = spot.bar.color ?? Colors.white;
@@ -180,7 +167,7 @@ class ChartWidget extends ConsumerWidget {
                             return LineTooltipItem(
                               'Year ${spot.x.toInt()}\n',
                               const TextStyle(
-                                color: Colors.black87,
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
                               ),
@@ -210,6 +197,21 @@ class ChartWidget extends ConsumerWidget {
                   ),
                 ),
               ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLegendItem(
+                  'Buying',
+                  Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 24),
+                _buildLegendItem(
+                  'Renting',
+                  Theme.of(context).colorScheme.secondary,
+                ),
+              ],
             ),
           ],
         ),

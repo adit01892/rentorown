@@ -16,7 +16,7 @@ class WealthFrontierPage extends StatelessWidget {
         padding: const EdgeInsets.all(24.0),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1000),
+            constraints: const BoxConstraints(maxWidth: 1200),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 // Desktop Layout
@@ -38,9 +38,12 @@ class WealthFrontierPage extends StatelessWidget {
                       const Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(width: 400, child: WealthFrontierInputs()),
+                          Expanded(flex: 4, child: WealthFrontierInputs()),
                           SizedBox(width: 24),
-                          Expanded(child: WealthFrontierResultsAndChart()),
+                          Expanded(
+                            flex: 7,
+                            child: WealthFrontierResultsAndChart(),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 24),

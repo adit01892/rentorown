@@ -65,7 +65,7 @@ class CoastFiChart extends ConsumerWidget {
             ),
             const SizedBox(height: 32),
             SizedBox(
-              height: 300,
+              height: 320,
               child: LineChart(
                 LineChartData(
                   gridData: FlGridData(
@@ -157,7 +157,7 @@ class CoastFiChart extends ConsumerWidget {
                   ],
                   lineTouchData: LineTouchData(
                     touchTooltipData: LineTouchTooltipData(
-                      getTooltipColor: (_) => Colors.blueGrey,
+                      getTooltipColor: (_) => const Color(0xFF1E1E2C),
                       getTooltipItems: (touchedSpots) {
                         return touchedSpots.map((spot) {
                           final label = spot.bar.color == Colors.orange
@@ -173,14 +173,16 @@ class CoastFiChart extends ConsumerWidget {
                               'Age ${(state.currentAge + spot.x).toInt()}\n',
                               const TextStyle(
                                 color: Colors.white,
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
                               children: [
                                 TextSpan(
                                   text: '$label: $value',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.normal,
+                                  style: TextStyle(
+                                    color: spot.bar.color ?? Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
@@ -188,9 +190,10 @@ class CoastFiChart extends ConsumerWidget {
                           }
                           return LineTooltipItem(
                             '$label: $value',
-                            const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.normal,
+                            TextStyle(
+                              color: spot.bar.color ?? Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
                             ),
                           );
                         }).toList();

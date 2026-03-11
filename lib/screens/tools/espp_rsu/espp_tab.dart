@@ -12,7 +12,7 @@ class EsppTab extends StatelessWidget {
       padding: const EdgeInsets.all(24.0),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
+          constraints: const BoxConstraints(maxWidth: 1200),
           child: LayoutBuilder(
             builder: (context, constraints) {
               if (constraints.maxWidth > 800) {
@@ -21,9 +21,9 @@ class EsppTab extends StatelessWidget {
                     const Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(width: 400, child: EsppInputs()),
+                        Expanded(flex: 4, child: EsppInputs()),
                         SizedBox(width: 24),
-                        Expanded(child: EsppResults()),
+                        Expanded(flex: 7, child: EsppResults()),
                       ],
                     ),
                     const SizedBox(height: 24),

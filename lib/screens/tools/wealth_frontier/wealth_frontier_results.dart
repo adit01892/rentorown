@@ -220,7 +220,7 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                     ),
                     const SizedBox(height: 32),
                     SizedBox(
-                      height: 350,
+                      height: 320,
                       child: LineChart(
                         LineChartData(
                           gridData: FlGridData(
@@ -313,7 +313,7 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                           ],
                           lineTouchData: LineTouchData(
                             touchTooltipData: LineTouchTooltipData(
-                              getTooltipColor: (_) => Colors.blueGrey,
+                              getTooltipColor: (_) => const Color(0xFF1E1E2C),
                               getTooltipItems: (touchedSpots) {
                                 return touchedSpots.map((spot) {
                                   String label = '';
@@ -332,14 +332,17 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                                       'Year ${spot.x.toInt()}\n',
                                       const TextStyle(
                                         color: Colors.white,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.bold,
                                       ),
                                       children: [
                                         TextSpan(
                                           text: '$label: $value',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.normal,
+                                          style: TextStyle(
+                                            color:
+                                                spot.bar.color ?? Colors.white,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ],
@@ -347,9 +350,10 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                                   }
                                   return LineTooltipItem(
                                     '$label: $value',
-                                    const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.normal,
+                                    TextStyle(
+                                      color: spot.bar.color ?? Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   );
                                 }).toList();
