@@ -93,7 +93,7 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      _strategyExplanation(state.strategy),
+                      _allocationExplanation(state, fullFormat),
                       style: const TextStyle(
                         fontSize: 13,
                         color: Color(0xFF757575),
@@ -101,10 +101,11 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildStrategyDropdown(
+                    _buildAllocationSlider(
                       context,
                       state,
                       ref.read(wealthFrontierProvider.notifier),
+                      fullFormat,
                     ),
                   ],
                 ),
@@ -393,52 +394,64 @@ class WealthFrontierResultsAndChart extends ConsumerWidget {
     );
   }
 
-  Widget _buildStrategyDropdown(
+  Widget _buildAllocationSlider(
     BuildContext context,
     WealthFrontierState state,
     WealthFrontierNotifier notifier,
+    NumberFormat currencyFormat,
   ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<WealthStrategy>(
-          isExpanded: true,
-          value: state.strategy,
-          onChanged: (value) {
-            if (value != null) notifier.updateStrategy(value);
-          },
-          items: const [
-            DropdownMenuItem(
-              value: WealthStrategy.payDebtFirst,
-              child: Text('Pay Debt First, then Invest'),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Debt (% of Discretionary Cash)',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
             ),
-            DropdownMenuItem(
-              value: WealthStrategy.split5050,
-              child: Text('Split 50/50'),
-            ),
-            DropdownMenuItem(
-              value: WealthStrategy.investFirst,
-              child: Text('Invest Everything (Minimum Debt Payments)'),
+            Text(
+              '${state.debtAllocationPercentage.toInt()}%',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ],
         ),
-      ),
+        Slider(
+          value: state.debtAllocationPercentage,
+          min: 0,
+          max: 100,
+          divisions: 20,
+          label: '${state.debtAllocationPercentage.toInt()}%',
+          onChanged: notifier.updateDebtAllocationPercentage,
+        ),
+      ],
     );
   }
 
-  String _strategyExplanation(WealthStrategy strategy) {
-    switch (strategy) {
-      case WealthStrategy.payDebtFirst:
-        return 'All extra cash aggressively eliminates debt first. Once debt hits \$0, everything goes to investments. Conservative but offers a guaranteed return equal to your debt rate.';
-      case WealthStrategy.investFirst:
-        return 'Minimum interest-only debt payments are made, and all remaining cash goes into investments. Higher potential returns but your debt persists longer.';
-      case WealthStrategy.split5050:
-        return 'Extra cash is split evenly — half pays down debt, half goes to investments. A balanced approach between guaranteed debt reduction and market growth.';
+  String _allocationExplanation(
+    WealthFrontierState state,
+    NumberFormat currencyFormat,
+  ) {
+    // If discretionary cash is negative, they can't even make minimums
+    if (state.extraMonthlyCash <= state.minimumDebtPayment) {
+      if (state.extraMonthlyCash < state.minimumDebtPayment) {
+        return 'Warning: Your total monthly cash (${currencyFormat.format(state.extraMonthlyCash)}) is less than your minimum debt payment (${currencyFormat.format(state.minimumDebtPayment)}). Debt will grow aggressively.';
+      }
+      return 'Your extra cash exactly covers the minimum payment of ${currencyFormat.format(state.minimumDebtPayment)}. 0% is left for discretionary investing or extra debt paydown.';
     }
+
+    final double discretionaryCash =
+        state.extraMonthlyCash - state.minimumDebtPayment;
+    final double debtAmt =
+        discretionaryCash * (state.debtAllocationPercentage / 100);
+    final double investAmt = discretionaryCash - debtAmt;
+    final double totalDebtPayment = state.minimumDebtPayment + debtAmt;
+
+    return 'After paying the minimum ${currencyFormat.format(state.minimumDebtPayment)}, you have ${currencyFormat.format(discretionaryCash)} in discretionary cash. You are allocating ${state.debtAllocationPercentage.toInt()}% (${currencyFormat.format(debtAmt)}) to extra debt payments, and ${100 - state.debtAllocationPercentage.toInt()}% (${currencyFormat.format(investAmt)}) to investments. Total debt payment is ${currencyFormat.format(totalDebtPayment)}/mo.';
   }
 
   Widget _buildInsightCard({

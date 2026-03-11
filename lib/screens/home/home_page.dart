@@ -41,10 +41,16 @@ class HomePage extends StatelessWidget {
                   LayoutBuilder(
                     builder: (context, constraints) {
                       int crossAxisCount = 1;
+                      double childAspectRatio = 1.4;
                       if (constraints.maxWidth > 800) {
                         crossAxisCount = 3;
+                        childAspectRatio = 1.4;
                       } else if (constraints.maxWidth > 500) {
                         crossAxisCount = 2;
+                        childAspectRatio = 1.25;
+                      } else {
+                        crossAxisCount = 1;
+                        childAspectRatio = 1.25;
                       }
                       return GridView.builder(
                         physics: const NeverScrollableScrollPhysics(),
@@ -53,7 +59,7 @@ class HomePage extends StatelessWidget {
                           crossAxisCount: crossAxisCount,
                           mainAxisSpacing: 16,
                           crossAxisSpacing: 16,
-                          childAspectRatio: 1.4,
+                          childAspectRatio: childAspectRatio,
                         ),
                         itemCount: availableTools.length,
                         itemBuilder: (context, index) {

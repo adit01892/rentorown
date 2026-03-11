@@ -67,7 +67,6 @@ MonteCarloResult _calculateMonteCarlo(MonteCarloParams params) {
 
   double sumFinalDebt = 0;
   double sumFinalInv = 0;
-  double sumFinalNw = 0;
 
   for (int i = 0; i < iterations; i++) {
     double currentDebt = state.currentDebt;
@@ -84,34 +83,25 @@ MonteCarloResult _calculateMonteCarlo(MonteCarloParams params) {
       currentInv = currentInv * (1 + thisMonthReturn);
 
       // 3. Allocate extra cash
-      double cash = state.extraMonthlyCash;
-      double debtAllocation = 0;
-      double invAllocation = 0;
+      double discretionaryCash = state.extraMonthlyCash;
+      double mandatoryDebtPayment = 0;
 
-      switch (state.strategy) {
-        case WealthStrategy.payDebtFirst:
-          if (currentDebt > 0) {
-            debtAllocation = min(cash, currentDebt);
-            invAllocation = cash - debtAllocation;
-          } else {
-            invAllocation = cash;
-          }
-        case WealthStrategy.investFirst:
-          // Enforce minimum interest-only payment to prevent unrealistic debt spiral
-          double interestOwed = state.currentDebt > 0
-              ? currentDebt * monthlyDebtRate
-              : 0;
-          double minPayment = min(cash, interestOwed);
-          debtAllocation = minPayment;
-          invAllocation = cash - minPayment;
-        case WealthStrategy.split5050:
-          if (currentDebt > 0) {
-            debtAllocation = min(cash * 0.5, currentDebt);
-            invAllocation = cash - debtAllocation;
-          } else {
-            invAllocation = cash;
-          }
+      if (currentDebt > 0) {
+        mandatoryDebtPayment = min(state.minimumDebtPayment, currentDebt);
       }
+
+      discretionaryCash = max(0, discretionaryCash - mandatoryDebtPayment);
+
+      double extraDebtPayment = 0;
+      if (currentDebt > mandatoryDebtPayment) {
+        extraDebtPayment = min(
+          discretionaryCash * (state.debtAllocationPercentage / 100),
+          currentDebt - mandatoryDebtPayment,
+        );
+      }
+
+      double debtAllocation = mandatoryDebtPayment + extraDebtPayment;
+      double invAllocation = discretionaryCash - extraDebtPayment;
 
       currentDebt = max(0, currentDebt - debtAllocation);
       currentInv += invAllocation;
@@ -121,7 +111,6 @@ MonteCarloResult _calculateMonteCarlo(MonteCarloParams params) {
 
     sumFinalDebt += currentDebt;
     sumFinalInv += currentInv;
-    sumFinalNw += (currentInv - currentDebt);
   }
 
   // Calculate percentiles at each month
@@ -154,6 +143,6 @@ MonteCarloResult _calculateMonteCarlo(MonteCarloParams params) {
     p90Path: p90,
     finalDebt: sumFinalDebt / iterations,
     finalInvestments: sumFinalInv / iterations,
-    finalNetWorth: sumFinalNw / iterations,
+    finalNetWorth: p50.last[1], // User explicitly requests median on the UI
   );
 }

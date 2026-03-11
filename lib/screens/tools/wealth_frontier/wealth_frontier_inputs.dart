@@ -47,14 +47,32 @@ class WealthFrontierInputs extends ConsumerWidget {
               onChanged: notifier.updateDebt,
             ),
             const SizedBox(height: 16),
-            _buildInputField(
-              context,
-              label: 'Extra Monthly Cash to Allocate',
-              tooltip:
-                  'How much free cash flow per month you have available to either invest or pay down debt.',
-              initialValue: state.extraMonthlyCash,
-              currencySymbol: currencySymbol,
-              onChanged: notifier.updateMonthlyCash,
+            Row(
+              children: [
+                Expanded(
+                  child: _buildInputField(
+                    context,
+                    label: 'Required Min. Debt Payment',
+                    tooltip:
+                        'The mandatory minimum monthly payment required to keep your debt in good standing.',
+                    initialValue: state.minimumDebtPayment,
+                    currencySymbol: currencySymbol,
+                    onChanged: notifier.updateMinimumDebtPayment,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildInputField(
+                    context,
+                    label: 'Extra Monthly Cash',
+                    tooltip:
+                        'Total discretionary cash left over each month *after* paying living expenses, which can be used to pay the minimum debt payment, invest, or make extra debt payments.',
+                    initialValue: state.extraMonthlyCash,
+                    currencySymbol: currencySymbol,
+                    onChanged: notifier.updateMonthlyCash,
+                  ),
+                ),
+              ],
             ),
             const Divider(height: 32),
             Text('Assumptions', style: Theme.of(context).textTheme.titleMedium),
