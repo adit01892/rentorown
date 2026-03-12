@@ -26,7 +26,17 @@ class CoastFiInputs extends ConsumerWidget {
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Advanced Mode'),
+              subtitle: const Text(
+                'Split assets into Pension/ISA/GIA with optional allocation detail.',
+              ),
+              value: state.advancedMode,
+              onChanged: notifier.updateAdvancedMode,
+            ),
+            const SizedBox(height: 8),
             _buildInputField(
               context,
               label: 'Current Age',
@@ -50,13 +60,35 @@ class CoastFiInputs extends ConsumerWidget {
             const SizedBox(height: 16),
             _buildInputField(
               context,
-              label: 'Current Retirement Savings',
-              tooltip: 'Total amount already invested for your retirement.',
-              initialValue: state.currentSavings,
+              label: 'End Age',
+              tooltip:
+                  'The age your retirement plan needs to last until.',
+              initialValue: state.endAge.toDouble(),
+              isCurrency: false,
               currencySymbol: currencySymbol,
-              onChanged: notifier.updateCurrentSavings,
+              onChanged: (val) => notifier.updateEndAge(val.toInt()),
             ),
             const SizedBox(height: 16),
+            if (!state.advancedMode)
+              _buildInputField(
+                context,
+                label: 'Current Retirement Savings',
+                tooltip: 'Total amount already invested for your retirement.',
+                initialValue: state.currentSavings,
+                currencySymbol: currencySymbol,
+                onChanged: notifier.updateCurrentSavings,
+              ),
+            if (!state.advancedMode) const SizedBox(height: 16),
+            if (!state.advancedMode)
+              _buildInputField(
+                context,
+                label: 'Monthly Savings',
+                tooltip: 'How much you are adding each month before retirement.',
+                initialValue: state.monthlySavings,
+                currencySymbol: currencySymbol,
+                onChanged: notifier.updateMonthlySavings,
+              ),
+            if (!state.advancedMode) const SizedBox(height: 16),
             _buildInputField(
               context,
               label: 'Desired Annual Spending in Retirement',
@@ -68,7 +100,7 @@ class CoastFiInputs extends ConsumerWidget {
             ),
             const Divider(height: 32),
             Text(
-              'Advanced Assumptions',
+              'Assumptions',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
@@ -86,18 +118,278 @@ class CoastFiInputs extends ConsumerWidget {
             const SizedBox(height: 16),
             _buildInputField(
               context,
-              label: 'Expected Real Annual Return (%)',
+              label: state.advancedMode
+                  ? 'Expected Return (Simple Mode) (%)'
+                  : 'Expected Real Annual Return (%)',
               tooltip:
-                  'Your expected average annual return after accounting for inflation.',
+                  'Your expected average annual return. In simple mode this should be real (inflation-adjusted).',
               initialValue: state.expectedAnnualReturn,
               isCurrency: false,
               currencySymbol: currencySymbol,
               suffixText: '%',
               onChanged: notifier.updateExpectedReturn,
             ),
+            const SizedBox(height: 16),
+            _buildInputField(
+              context,
+              label: 'Inflation Rate (%)',
+              tooltip: 'Expected long-term inflation rate.',
+              initialValue: state.inflationRate,
+              isCurrency: false,
+              currencySymbol: currencySymbol,
+              suffixText: '%',
+              onChanged: notifier.updateInflationRate,
+            ),
+            const SizedBox(height: 16),
+            _buildInputField(
+              context,
+              label: 'Income Growth Rate (%)',
+              tooltip: 'Expected annual growth of your contributions.',
+              initialValue: state.incomeGrowthRate,
+              isCurrency: false,
+              currencySymbol: currencySymbol,
+              suffixText: '%',
+              onChanged: notifier.updateIncomeGrowthRate,
+            ),
+            if (state.advancedMode) ...[
+              const Divider(height: 32),
+              Text(
+                'Advanced: Accounts',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              _buildInputField(
+                context,
+                label: 'Pension Access Age',
+                tooltip: 'Minimum age you can start drawing from your pension.',
+                initialValue: state.pensionAccessAge.toDouble(),
+                isCurrency: false,
+                currencySymbol: currencySymbol,
+                onChanged: (val) => notifier.updatePensionAccessAge(val.toInt()),
+              ),
+              const SizedBox(height: 16),
+              _buildAccountSection(
+                context,
+                ref,
+                title: 'Pension',
+                accountKey: 'pension',
+              ),
+              const SizedBox(height: 16),
+              _buildAccountSection(
+                context,
+                ref,
+                title: 'ISA',
+                accountKey: 'isa',
+              ),
+              const SizedBox(height: 16),
+              _buildAccountSection(
+                context,
+                ref,
+                title: 'GIA',
+                accountKey: 'gia',
+              ),
+            ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAccountSection(
+    BuildContext context,
+    WidgetRef ref, {
+    required String title,
+    required String accountKey,
+  }) {
+    final state = ref.watch(coastFiProvider);
+    final notifier = ref.read(coastFiProvider.notifier);
+    final currencySymbol = ref.watch(countryProvider).currencySymbol;
+    final account = accountKey == 'pension'
+        ? state.pension
+        : accountKey == 'isa'
+            ? state.isa
+            : state.gia;
+
+    final allocationTotal = account.allocationTotal();
+    final allocationWarning = account.useCustomAllocation &&
+        allocationTotal > 0 &&
+        (allocationTotal - 100).abs() > 0.5;
+
+    return Card(
+      color: const Color(0xFFF9FAFB),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            _buildInputField(
+              context,
+              label: 'Total',
+              tooltip: 'Current balance for this account.',
+              initialValue: account.startingBalance,
+              currencySymbol: currencySymbol,
+              onChanged: (val) =>
+                  notifier.updateAccountBalance(accountKey, val),
+            ),
+            const SizedBox(height: 12),
+            _buildInputField(
+              context,
+              label: 'Monthly Saving',
+              tooltip: 'Monthly contribution to this account.',
+              initialValue: account.monthlySaving,
+              currencySymbol: currencySymbol,
+              onChanged: (val) =>
+                  notifier.updateAccountMonthlySaving(accountKey, val),
+            ),
+            const SizedBox(height: 8),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Custom Allocation'),
+              subtitle: const Text('Toggle to specify asset mix and returns.'),
+              value: account.useCustomAllocation,
+              onChanged: (value) =>
+                  notifier.updateAccountUseCustom(accountKey, value),
+            ),
+            if (!account.useCustomAllocation)
+              _buildInputField(
+                context,
+                label: 'Expected Return (%)',
+                tooltip: 'Single return assumption for this account.',
+                initialValue: account.simpleReturn,
+                isCurrency: false,
+                currencySymbol: currencySymbol,
+                suffixText: '%',
+                onChanged: (val) =>
+                    notifier.updateAccountSimpleReturn(accountKey, val),
+              ),
+            if (account.useCustomAllocation) ...[
+              const SizedBox(height: 8),
+              _buildAssetRow(
+                context,
+                ref,
+                accountKey: accountKey,
+                assetKey: AssetKey.stocks,
+                label: 'Stocks',
+              ),
+              _buildAssetRow(
+                context,
+                ref,
+                accountKey: accountKey,
+                assetKey: AssetKey.bonds,
+                label: 'Bonds',
+              ),
+              _buildAssetRow(
+                context,
+                ref,
+                accountKey: accountKey,
+                assetKey: AssetKey.cash,
+                label: 'Cash',
+              ),
+              _buildAssetRow(
+                context,
+                ref,
+                accountKey: accountKey,
+                assetKey: AssetKey.crypto,
+                label: 'Crypto',
+              ),
+              _buildAssetRow(
+                context,
+                ref,
+                accountKey: accountKey,
+                assetKey: AssetKey.other,
+                label: 'Other',
+              ),
+              if (allocationWarning)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'Allocations total ${allocationTotal.toStringAsFixed(0)}%. Aim for 100%.',
+                    style: const TextStyle(color: Colors.orange),
+                  ),
+                ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAssetRow(
+    BuildContext context,
+    WidgetRef ref, {
+    required String accountKey,
+    required AssetKey assetKey,
+    required String label,
+  }) {
+    final state = ref.watch(coastFiProvider);
+    final notifier = ref.read(coastFiProvider.notifier);
+    final currencySymbol = ref.watch(countryProvider).currencySymbol;
+    final account = accountKey == 'pension'
+        ? state.pension
+        : accountKey == 'isa'
+            ? state.isa
+            : state.gia;
+    final asset = account.allocations[assetKey]!;
+
+    return Column(
+      children: [
+        CheckboxListTile.adaptive(
+          contentPadding: EdgeInsets.zero,
+          title: Text(label),
+          value: asset.enabled,
+          onChanged: (value) => notifier.updateAccountAsset(
+            accountKey,
+            assetKey,
+            enabled: value ?? false,
+          ),
+        ),
+        if (asset.enabled)
+          Row(
+            children: [
+              Expanded(
+                child: _buildInputField(
+                  context,
+                  label: 'Allocation %',
+                  tooltip: 'Percentage of this account in $label.',
+                  initialValue: asset.allocationPercent,
+                  isCurrency: false,
+                  currencySymbol: currencySymbol,
+                  suffixText: '%',
+                  onChanged: (val) => notifier.updateAccountAsset(
+                    accountKey,
+                    assetKey,
+                    allocationPercent: val,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildInputField(
+                  context,
+                  label: 'Return %',
+                  tooltip: 'Expected annual return for $label.',
+                  initialValue: asset.expectedReturn,
+                  isCurrency: false,
+                  currencySymbol: currencySymbol,
+                  suffixText: '%',
+                  onChanged: (val) => notifier.updateAccountAsset(
+                    accountKey,
+                    assetKey,
+                    expectedReturn: val,
+                  ),
+                ),
+              ),
+            ],
+          ),
+      ],
     );
   }
 

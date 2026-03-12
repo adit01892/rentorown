@@ -10,6 +10,7 @@ class CoastFiResults extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(coastFiProvider);
+    final notifier = ref.read(coastFiProvider.notifier);
     final currencySymbol = ref.watch(countryProvider).currencySymbol;
 
     final currencyFormat = NumberFormat.compactCurrency(
@@ -23,7 +24,25 @@ class CoastFiResults extends ConsumerWidget {
 
     final requiredCorpus = state.requiredRetirementCorpus;
     final coastNumberToday = state.coastNumberToday;
-    final isCoasting = state.isCoasting;
+    final currentTotal = state.advancedMode
+        ? state.pension.startingBalance +
+            state.isa.startingBalance +
+            state.gia.startingBalance
+        : state.currentSavings;
+    final isCoasting = currentTotal >= coastNumberToday;
+
+    final projection = notifier.computeProjection(advanced: state.advancedMode);
+    final retirementRow = projection.firstWhere(
+      (row) => row.age == state.retirementAge,
+      orElse: () => projection.last,
+    );
+    final meetsFire = retirementRow.total >= retirementRow.fireNumber;
+    final coastRow = projection.firstWhere(
+      (row) => row.total >= row.fireNumber,
+      orElse: () => projection.last,
+    );
+    final reachesCoast = coastRow.total >= coastRow.fireNumber;
+    final coastAge = reachesCoast ? coastRow.age : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,9 +91,19 @@ class CoastFiResults extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
+                  reachesCoast
+                      ? 'Coast FI age: ${coastAge!} (portfolio meets FIRE number)'
+                      : 'Coast FI age: not reached by ${projection.last.age}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.white70,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
                   isCoasting
-                      ? 'You can stop saving right now! Your current savings of ${fullCurrencyFormat.format(state.currentSavings)} will naturally grow to your target.'
-                      : 'You need ${fullCurrencyFormat.format(coastNumberToday - state.currentSavings)} more invested today to stop saving forever.',
+                      ? 'You can stop saving right now! Your current savings of ${fullCurrencyFormat.format(currentTotal)} will naturally grow to your target.'
+                      : 'You need ${fullCurrencyFormat.format(coastNumberToday - currentTotal)} more invested today to stop saving forever.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white,
                     height: 1.5,
@@ -103,9 +132,9 @@ class CoastFiResults extends ConsumerWidget {
                         currencyFormat.format(requiredCorpus),
                         style: Theme.of(context).textTheme.headlineMedium
                             ?.copyWith(
-                              color: const Color(0xFF212121),
-                              fontWeight: FontWeight.bold,
-                            ),
+                          color: const Color(0xFF212121),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -122,23 +151,25 @@ class CoastFiResults extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Projected Nest Egg',
+                        'Projected Portfolio at Retirement',
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        currencyFormat.format(state.coastingFutureValue),
+                        currencyFormat.format(retirementRow.total),
                         style: Theme.of(context).textTheme.headlineMedium
                             ?.copyWith(
-                              color: isCoasting
-                                  ? Colors.green[800]
-                                  : const Color(0xFF212121),
-                              fontWeight: FontWeight.bold,
-                            ),
+                          color: meetsFire
+                              ? Colors.green[800]
+                              : const Color(0xFF212121),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'If you save $currencySymbol 0 more',
+                        meetsFire
+                            ? 'Meets FIRE number at ${state.retirementAge}'
+                            : 'Below FIRE number at ${state.retirementAge}',
                         style: const TextStyle(color: Color(0xFF757575)),
                       ),
                     ],
@@ -148,75 +179,7 @@ class CoastFiResults extends ConsumerWidget {
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        // Contextual insight
-        if (isCoasting && state.currentAge < 40)
-          _buildInsightCard(
-            context,
-            icon: Icons.celebration,
-            color: Colors.green,
-            text:
-                'You\'ve reached Coast FI at age ${state.currentAge}! This means you could switch to a lower-paying passion job and still retire comfortably at ${state.retirementAge}.',
-          )
-        else if (isCoasting)
-          _buildInsightCard(
-            context,
-            icon: Icons.check_circle_outline,
-            color: Colors.green,
-            text:
-                'You\'ve hit your Coast Number! If you never save another penny, your current savings should grow to cover retirement at your target spending level.',
-          )
-        else if ((coastNumberToday - state.currentSavings) / coastNumberToday <
-            0.20)
-          _buildInsightCard(
-            context,
-            icon: Icons.trending_up,
-            color: Colors.orange,
-            text:
-                'Almost there! You\'re within ${(((coastNumberToday - state.currentSavings) / coastNumberToday) * 100).toStringAsFixed(0)}% of your Coast Number. A small boost in savings could get you across the finish line.',
-          )
-        else
-          _buildInsightCard(
-            context,
-            icon: Icons.info_outline,
-            color: Theme.of(context).colorScheme.primary,
-            text:
-                'You need ${fullCurrencyFormat.format(coastNumberToday - state.currentSavings)} more to reach your Coast Number. Once you hit it, your savings can grow to your target on autopilot.',
-          ),
       ],
-    );
-  }
-
-  Widget _buildInsightCard(
-    BuildContext context, {
-    required IconData icon,
-    required Color color,
-    required String text,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 13,
-                color: color.withValues(alpha: 0.9),
-                height: 1.4,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

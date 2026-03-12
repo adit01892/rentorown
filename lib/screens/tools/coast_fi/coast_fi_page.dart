@@ -5,6 +5,7 @@ import 'coast_fi_inputs.dart';
 import 'coast_fi_results.dart';
 import 'coast_fi_chart.dart';
 import 'coast_fi_methodology.dart';
+import 'coast_fi_table.dart';
 
 class CoastFiPage extends StatelessWidget {
   const CoastFiPage({super.key});
@@ -50,6 +51,8 @@ class CoastFiPage extends StatelessWidget {
                                 SizedBox(height: 24),
                                 CoastFiChart(),
                                 SizedBox(height: 24),
+                                CoastFiTable(),
+                                SizedBox(height: 24),
                                 CoastFiMethodology(),
                               ],
                             ),
@@ -82,6 +85,8 @@ class CoastFiPage extends StatelessWidget {
                     CoastFiResults(),
                     SizedBox(height: 16),
                     CoastFiChart(),
+                    SizedBox(height: 16),
+                    CoastFiTable(),
                     SizedBox(height: 16),
                     CoastFiMethodology(),
                   ],

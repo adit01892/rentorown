@@ -31,24 +31,34 @@ class CoastFiMethodology extends StatelessWidget {
               children: [
                 _buildSection(
                   context,
-                  title: 'Coast FI Formula',
+                  title: 'Coast FI Formula (Simple Mode)',
                   color: Theme.of(context).colorScheme.primary,
                   content: [
-                    'This tool models whether your current retirement savings will grow enough to fund your retirement *without* any additional contributions.',
-                    '• **Target Portfolio**: Calculated algebraically as `Desired Annual Spending / Safe Withdrawal Rate`. For a \$40k spending and 4% rule, your target is \$1,000,000.',
-                    '• **Coast FI Number**: Calculated by discounting your Target Portfolio backwards in time from Retirement Age to Current Age using your Expected Real Annual Return.',
-                    '• **Formula**: `Target Portfolio / ((1 + Expected Return) ^ Years to Retirement)`',
+                    'This tool models whether your current retirement savings will grow enough to fund your retirement without any additional contributions.',
+                    '• **Target Portfolio**: `Desired Annual Spending / Safe Withdrawal Rate`',
+                    '• **Coast FI Number**: `Target Portfolio / ((1 + Expected Return) ^ Years to Retirement)`',
                   ],
                 ),
                 const SizedBox(height: 16),
                 _buildSection(
                   context,
-                  title: 'Line Chart Trajectories',
+                  title: 'Projection Engine (Advanced Mode)',
+                  color: Colors.blueGrey,
+                  content: [
+                    '• Simulates year-by-year portfolio growth across Pension, ISA, and GIA accounts.',
+                    '• Contributions grow by your Income Growth Rate until retirement age.',
+                    '• Retirement spending inflates each year after retirement using the Inflation Rate.',
+                    '• Withdrawals happen in order: GIA → ISA → Pension (after pension access age).',
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _buildSection(
+                  context,
+                  title: 'Charts and FIRE Line',
                   color: Colors.orange,
                   content: [
-                    '• **Required (Orange Curve)**: The mathematical minimum you needed saved at any given age to perfectly hit your Target Portfolio at retirement WITHOUT adding further money.',
-                    '• **Projected (Primary Color)**: The compounding growth of your *actual* current savings if you leave it alone until retirement.',
-                    '• **Intersection**: The point where these two lines cross is technically your exact Coast FI age. If your projected line is *above* the required line today, you are already Coast FI.',
+                    '• **FIRE Number** is calculated each year as `Inflation-adjusted spending / Safe Withdrawal Rate`.',
+                    '• Advanced mode charts show account balances over time plus the FIRE line.',
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -71,7 +81,7 @@ class CoastFiMethodology extends StatelessWidget {
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Reality Check: This model assumes you can reliably achieve your expected "Real" (inflation-adjusted) return every single year until retirement. Real stock markets are volatile and experience prolonged bear markets. Always leave a buffer rather than coasting on the exact perfect mathematical margin.',
+                          'Reality Check: This model assumes stable long-term returns and inflation. Real markets are volatile. Use conservative assumptions and leave a buffer. Tax implications of savings are not considered.',
                           style: TextStyle(fontSize: 13, color: Colors.black87),
                         ),
                       ),
